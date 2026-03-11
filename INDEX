@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Evoco — Mediterranean Objects</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cream: #f5f0e8;
+      --blush: #e8d5c4;
+      --dust: #c9b8a8;
+      --terra: #a07860;
+      --charcoal: #2a2420;
+      --muted: #7a6a5a;
+      --soft-white: #faf8f4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--soft-white);
+      color: var(--charcoal);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--charcoal);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--terra);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), width 0.3s, height 0.3s, opacity 0.3s;
+      opacity: 0.6;
+    }
+    .cursor-ring.expand { width: 60px; height: 60px; opacity: 0.3; }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 48px;
+      mix-blend-mode: multiply;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--charcoal); }
+
+    /* HERO */
+    .hero {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 64px 80px 64px;
+      background: var(--cream);
+      position: relative;
+    }
+    .hero-left::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 70%, rgba(192,162,132,0.15) 0%, transparent 70%);
+    }
+    .hero-tag {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 6vw, 88px);
+      font-weight: 300;
+      line-height: 1.0;
+      color: var(--charcoal);
+      margin-bottom: 32px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--terra);
+    }
+    .hero-sub {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 320px;
+      margin-bottom: 48px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      text-decoration: none;
+      border-bottom: 1px solid var(--dust);
+      padding-bottom: 8px;
+      transition: gap 0.3s, border-color 0.3s;
+    }
+    .btn-primary:hover { gap: 28px; border-color: var(--terra); }
+    .btn-primary::after { content: '→'; }
+
+    .hero-right {
+      background: var(--blush);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .hero-img-placeholder .big-circle {
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--dust) 0%, var(--terra) 100%);
+      opacity: 0.4;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .hero-img-placeholder .product-label {
+      position: absolute;
+      bottom: 48px; left: 48px;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 48px;
+      right: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dust);
+    }
+    .hero-scroll::after {
+      content: '';
+      width: 1px;
+      height: 48px;
+      background: var(--dust);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(0.4); opacity: 0.4; }
+    }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      background: var(--charcoal);
+      padding: 14px 0;
+      overflow: hidden;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      animation: marquee 20s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-track span {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dust);
+      padding: 0 48px;
+    }
+    .marquee-track span.sep { color: var(--terra); padding: 0; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* INTRO */
+    .intro {
+      padding: 140px 64px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .intro-text h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 3.5vw, 52px);
+      font-weight: 300;
+      line-height: 1.25;
+      margin-bottom: 28px;
+    }
+    .intro-text p {
+      font-size: 14px;
+      line-height: 2;
+      color: var(--muted);
+      max-width: 400px;
+    }
+    .intro-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .intro-card {
+      aspect-ratio: 3/4;
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .intro-card:hover { transform: translateY(-8px); }
+    .intro-card:nth-child(1) { background: var(--blush); margin-top: 40px; }
+    .intro-card:nth-child(2) { background: var(--dust); }
+    .intro-card:nth-child(3) { background: linear-gradient(160deg, var(--cream), var(--blush)); }
+    .intro-card:nth-child(4) { background: var(--cream); margin-top: 40px; }
+    .intro-card-label {
+      position: absolute;
+      bottom: 16px; left: 16px;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .intro-card-num {
+      position: absolute;
+      top: 16px; right: 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* PRODUCTS */
+    .products {
+      padding: 80px 64px 140px;
+      background: var(--cream);
+    }
+    .products-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 64px;
+    }
+    .products-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 3vw, 48px);
+      font-weight: 300;
+    }
+    .products-header a {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terra);
+      text-decoration: none;
+      border-bottom: 1px solid var(--terra);
+      padding-bottom: 4px;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .product-card {
+      position: relative;
+      cursor: none;
+    }
+    .product-img {
+      aspect-ratio: 3/4;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .product-card:hover .product-img { transform: scale(1.03); }
+    .product-img-inner {
+      width: 100%; height: 100%;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .product-card:hover .product-img-inner { transform: scale(1.06); }
+    .p1 .product-img-inner { background: linear-gradient(155deg, #e8ddd0, #d4bfaa); }
+    .p2 .product-img-inner { background: linear-gradient(155deg, #ddd5c8, #c8b8a5); }
+    .p3 .product-img-inner { background: linear-gradient(155deg, #e2d8cc, #cbbaa8); }
+    .p4 .product-img-inner { background: linear-gradient(155deg, #d8cfc3, #c4b09e); }
+    .product-icon {
+      font-size: 40px;
+      opacity: 0.3;
+    }
+    .product-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(42,36,32,0.0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.4s;
+    }
+    .product-card:hover .product-overlay { background: rgba(42,36,32,0.06); }
+    .product-add {
+      opacity: 0;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      border: 1px solid var(--charcoal);
+      padding: 12px 24px;
+      transition: opacity 0.3s;
+      background: rgba(245,240,232,0.9);
+    }
+    .product-card:hover .product-add { opacity: 1; }
+    .product-type {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 6px;
+    }
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 300;
+      margin-bottom: 6px;
+    }
+    .product-price {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* EDITORIAL */
+    .editorial {
+      padding: 140px 64px;
+      display: grid;
+      grid-template-columns: 5fr 4fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .editorial-visual {
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--blush) 0%, var(--dust) 60%, var(--terra) 100%);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .editorial-visual::after {
+      content: 'EVOCO';
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 120px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.12);
+      position: absolute;
+      bottom: -20px; right: -10px;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+    .editorial-text .label {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 24px;
+    }
+    .editorial-text h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 3.5vw, 54px);
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 28px;
+    }
+    .editorial-text h2 em { font-style: italic; }
+    .editorial-text p {
+      font-size: 14px;
+      line-height: 2;
+      color: var(--muted);
+      margin-bottom: 48px;
+    }
+
+    /* CATEGORIES */
+    .categories {
+      background: var(--charcoal);
+      padding: 100px 64px;
+    }
+    .categories h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 3vw, 48px);
+      font-weight: 300;
+      color: var(--cream);
+      margin-bottom: 56px;
+      text-align: center;
+    }
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .cat-item {
+      aspect-ratio: 2/3;
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      cursor: none;
+    }
+    .cat-item:hover { transform: translateY(-6px); }
+    .cat-item:nth-child(1) { background: linear-gradient(160deg, #c9b8a8, #a07860); }
+    .cat-item:nth-child(2) { background: linear-gradient(160deg, #e8d5c4, #c9a888); margin-top: 30px; }
+    .cat-item:nth-child(3) { background: linear-gradient(160deg, #b5a090, #8a6e5c); }
+    .cat-item:nth-child(4) { background: linear-gradient(160deg, #d4c4b0, #b09080); margin-top: 30px; }
+    .cat-item:nth-child(5) { background: linear-gradient(160deg, #c0a890, #907060); }
+    .cat-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: white;
+      font-style: italic;
+    }
+    .cat-count {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 80px 64px 48px;
+      background: var(--soft-white);
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      border-top: 1px solid var(--blush);
+    }
+    .footer-brand .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .footer-brand p {
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--muted);
+      max-width: 240px;
+    }
+    .footer-col h4 {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li {
+      margin-bottom: 10px;
+    }
+    .footer-col ul li a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-col ul li a:hover { color: var(--charcoal); }
+    .footer-bottom {
+      padding: 24px 64px;
+      background: var(--soft-white);
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--blush);
+    }
+    .footer-bottom p {
+      font-size: 11px;
+      color: var(--dust);
+      letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Evoco</a>
+    <ul class="nav-links">
+      <li><a href="#">Shop</a></li>
+      <li><a href="#">Collections</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-tag">Mediterranean Objects — Est. 2025</p>
+      <h1 class="hero-title">Objects<br>that carry<br><em>place</em></h1>
+      <p class="hero-sub">Evoco brings the memory of Mediterranean light, texture, and warmth into everyday objects. Each piece is made to evoke a feeling.</p>
+      <a href="#" class="btn-primary">Explore the collection</a>
+      <div class="hero-scroll">Scroll</div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-img-placeholder">
+        <div class="big-circle"></div>
+        <p class="product-label">New — Postcards from the Coast</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>Postcards</span><span class="sep">·</span>
+      <span>Tote Bags</span><span class="sep">·</span>
+      <span>Posters</span><span class="sep">·</span>
+      <span>Stickers</span><span class="sep">·</span>
+      <span>Art Prints</span><span class="sep">·</span>
+      <span>Mediterranean Objects</span><span class="sep">·</span>
+      <span>Made with Care</span><span class="sep">·</span>
+      <span>Spain</span><span class="sep">·</span>
+      <span>Postcards</span><span class="sep">·</span>
+      <span>Tote Bags</span><span class="sep">·</span>
+      <span>Posters</span><span class="sep">·</span>
+      <span>Stickers</span><span class="sep">·</span>
+      <span>Art Prints</span><span class="sep">·</span>
+      <span>Mediterranean Objects</span><span class="sep">·</span>
+      <span>Made with Care</span><span class="sep">·</span>
+      <span>Spain</span><span class="sep">·</span>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="intro">
+    <div class="intro-text reveal">
+      <h2>Rooted in the <em style="font-style:italic; font-family:'Cormorant Garamond', serif;">Mediterranean</em></h2>
+      <p>Every Evoco object is a distillation — of light on stone, the smell of salt air, a colour seen only at dusk. We design for the ones who travel not just to see, but to remember.</p>
+    </div>
+    <div class="intro-visual reveal reveal-delay-2">
+      <div class="intro-card">
+        <div class="intro-card-num">01</div>
+        <div class="intro-card-label">Postcards</div>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-num">02</div>
+        <div class="intro-card-label">Posters</div>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-num">03</div>
+        <div class="intro-card-label">Totes</div>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-num">04</div>
+        <div class="intro-card-label">Prints</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products">
+    <div class="products-header reveal">
+      <h2>New Arrivals</h2>
+      <a href="#">View all</a>
+    </div>
+    <div class="products-grid">
+      <div class="product-card p1 reveal reveal-delay-1">
+        <div class="product-img">
+          <div class="product-img-inner">
+            <span class="product-icon">✉</span>
+          </div>
+          <div class="product-overlay">
+            <button class="product-add">Add to bag</button>
+          </div>
+        </div>
+        <p class="product-type">Postcard</p>
+        <h3 class="product-name">Costa Brava, Dawn</h3>
+        <p class="product-price">€4.50</p>
+      </div>
+      <div class="product-card p2 reveal reveal-delay-2">
+        <div class="product-img">
+          <div class="product-img-inner">
+            <span class="product-icon">🛍</span>
+          </div>
+          <div class="product-overlay">
+            <button class="product-add">Add to bag</button>
+          </div>
+        </div>
+        <p class="product-type">Tote Bag</p>
+        <h3 class="product-name">Mar i Muntanya</h3>
+        <p class="product-price">€22.00</p>
+      </div>
+      <div class="product-card p3 reveal reveal-delay-3">
+        <div class="product-img">
+          <div class="product-img-inner">
+            <span class="product-icon">🖼</span>
+          </div>
+          <div class="product-overlay">
+            <button class="product-add">Add to bag</button>
+          </div>
+        </div>
+        <p class="product-type">Poster</p>
+        <h3 class="product-name">Asturias, Golden Hour</h3>
+        <p class="product-price">€18.00</p>
+      </div>
+      <div class="product-card p4 reveal reveal-delay-4">
+        <div class="product-img">
+          <div class="product-img-inner">
+            <span class="product-icon">◈</span>
+          </div>
+          <div class="product-overlay">
+            <button class="product-add">Add to bag</button>
+          </div>
+        </div>
+        <p class="product-type">Sticker Set</p>
+        <h3 class="product-name">Iberian Details</h3>
+        <p class="product-price">€8.00</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDITORIAL -->
+  <section class="editorial">
+    <div class="editorial-visual reveal"></div>
+    <div class="editorial-text reveal reveal-delay-2">
+      <p class="label">The Evoco Way</p>
+      <h2>Designed to be <em>kept</em>, not discarded</h2>
+      <p>We believe a postcard should outlast the trip. That a tote should feel like it belongs somewhere beautiful. Every material, every print, every detail is chosen to age well — to become more yours over time.</p>
+      <a href="#" class="btn-primary">Our process</a>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="categories">
+    <h2 class="reveal">Shop by category</h2>
+    <div class="cat-grid">
+      <div class="cat-item reveal reveal-delay-1">
+        <p class="cat-name">Postcards</p>
+        <p class="cat-count">12 pieces</p>
+      </div>
+      <div class="cat-item reveal reveal-delay-2">
+        <p class="cat-name">Posters</p>
+        <p class="cat-count">8 pieces</p>
+      </div>
+      <div class="cat-item reveal reveal-delay-3">
+        <p class="cat-name">Tote Bags</p>
+        <p class="cat-count">6 pieces</p>
+      </div>
+      <div class="cat-item reveal reveal-delay-4">
+        <p class="cat-name">Stickers</p>
+        <p class="cat-count">15 pieces</p>
+      </div>
+      <div class="cat-item reveal reveal-delay-4">
+        <p class="cat-name">Art Prints</p>
+        <p class="cat-count">10 pieces</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">
+      <div class="logo">Evoco</div>
+      <p>Mediterranean objects for those who travel to remember. Designed in Spain.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">Postcards</a></li>
+        <li><a href="#">Tote Bags</a></li>
+        <li><a href="#">Posters</a></li>
+        <li><a href="#">Stickers</a></li>
+        <li><a href="#">Art Prints</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Info</h4>
+      <ul>
+        <li><a href="#">About Evoco</a></li>
+        <li><a href="#">Shipping</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Follow</h4>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Pinterest</a></li>
+        <li><a href="#">Newsletter</a></li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <p>© 2025 Evoco. All rights reserved.</p>
+    <p>evocostore.com</p>
+  </div>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button, .product-card, .cat-item').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Hero reveal on load
+    document.querySelectorAll('.hero-left > *').forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = `opacity 1s ease ${i * 0.15}s, transform 1s cubic-bezier(0.16,1,0.3,1) ${i * 0.15}s`;
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  </script>
+</body>
+</html>
